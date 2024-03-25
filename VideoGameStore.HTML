@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<link rel="stylesheet" href="style.css">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@300;400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Caladea:ital,wght@0,400;0,700;1,400;1,700&family=Martian+Mono:wght@100..800&display=swap" rel="stylesheet">
+
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GG, Go Next</title>    
+
+    <script>
+    function searchGame() {
+        let input = document.getElementById('searchInput').value.toLowerCase();
+        const suggestions = document.getElementById('suggestions');
+        const searchInput = document.getElementById('searchInput');
+        suggestions.textContent = '';
+
+        const games = {
+            'Elden Ring': '#souls-games',
+            'Helldivers 2': '#shooter-games',
+            'Ghost of Tsushima': '#game-of-the-week',
+            'Dark Souls 3': '#souls-games',
+            'Sekiro': '#souls-games',
+            'Call of Duty': '#shooter-games',
+            'Mortal Kombat 1': '#fighting-games',
+            'Street Fighter 6': '#fighting-games',
+            'Tekken 8': '#fighting-games'
+        };
+
+        const filteredGames = Object.keys(games).filter(game => game.includes(input));
+
+        if (filteredGames.length > 0 && input !== '') {
+            const suggestionsList = document.createElement('ul');
+            filteredGames.forEach(function(game) {
+                const listItem = document.createElement('li');
+                listItem.textContent = game;
+                listItem.addEventListener('click', function() {
+                    window.location.assign(games[game]);
+                    searchInput.value = ''; // Clears the search input field
+                    suggestions.textContent = ''; // Clears the suggestions dropdown content
+                    suggestions.style.display = 'none'; // Optionally hide the suggestions dropdown
+                });
+                suggestionsList.appendChild(listItem);
+            });
+            suggestions.appendChild(suggestionsList);
+            suggestions.style.display = 'block';
+            suggestions.classList.remove('empty');
+        } else {
+            suggestions.style.display = 'none';
+            suggestions.classList.add('empty');
+        }
+    }
+
+    let cart = {};
+    let checkoutWindow = null; // Declare checkoutWindow globally
+
+    function addToCart(book) {
+        if (cart[book.id]) {
+            cart[book.id].quantity++;
+        } else {
+            cart[book.id] = {...book, quantity: 1};
+        }
+        if (document.getElementById('cartDetails').style.display === 'block') {
+            showCart();
+        }
+
+    }
+
+    function removeFromCart(id) {
+        if (cart[id].quantity > 1) {
+            cart[id].quantity--;
+        } else {
+            delete cart[id];
+        }
+        showCart();  
+    }
+
+    function hideCart() {
+    let cartDetails = document.getElementById('cartDetails');
+    cartDetails.style.display = 'none';
+    }
+
+    function showCart() {
+    let cartDetails = document.getElementById('cartDetails');
+    cartDetails.innerHTML = ''; // Clear the cartDetails content first
+
+    // Create a flex container for the heading and buttons
+    let headerContainer = document.createElement('div');
+    headerContainer.style.display = 'flex';
+    headerContainer.style.justifyContent = 'space-between';
+    headerContainer.style.alignItems = 'center';
+
+    // Create and append the "Your Cart" heading to the flex container
+    let cartHeading = document.createElement('h2');
+    cartHeading.textContent = 'Your Cart';
+    headerContainer.appendChild(cartHeading);
+
+    // Create and append the "Close Cart" button to the flex container
+    let closeButton = document.createElement('button');
+    closeButton.onclick = hideCart;
+    closeButton.textContent = 'Close Cart';
+    headerContainer.appendChild(closeButton);
+
+    // Create and append the "Checkout" button to the flex container
+    let checkoutButton = document.createElement('button');
+    checkoutButton.onclick = checkout;
+    checkoutButton.textContent = 'Checkout';
+    headerContainer.appendChild(checkoutButton);
+
+    // Append the flex container to the cartDetails
+    cartDetails.appendChild(headerContainer);
+
+    // Continue with the rest of the showCart function...
+    let bookRow = document.createElement('div');
+    bookRow.className = 'book-row';
+    Object.values(cart).forEach((book) => {
+        let bookElement = document.createElement('div');
+        bookElement.innerHTML = `<img src="${book.cover}" alt="${book.title} cover"><br>${book.title}<br>Price: ${book.price}<br>Quantity: ${book.quantity}<br><button onclick="removeFromCart('${book.id}')">Remove</button>`;
+        bookRow.appendChild(bookElement);
+    });
+    cartDetails.appendChild(bookRow);
+
+    if (Object.keys(cart).length === 0) {
+        cartDetails.style.display = 'none';
+    } else {
+        cartDetails.style.display = 'block';
+    }
+}
+    function checkout() {
+    // If checkout window is not open, open a new one
+    if (!checkoutWindow || checkoutWindow.closed) {
+        checkoutWindow = window.open("", "Checkout Window");
+    } else {
+        // If checkout window is already open, clear its content
+        checkoutWindow.document.body.innerHTML = '';
+    }
+        
+    // Set the title of the new window
+    checkoutWindow.document.write("<head><title>Checkout Page</title></head>");
+
+    // Write the cart data to the new window
+    checkoutWindow.document.write("<h1>Checkout Page</h1>");
+
+    // Checkout Styles
+    checkoutWindow.document.write("<style>body {display; inline-block; justify-content: center; text-align:center; color: black; background-color: rgb(206, 201, 240); border: 10px solid black; font-weight:bold; font-family: 'Lucida Sans'; font-size:22px;} table {width: 100%; table-layout: fixed;} th, td {border: 5px solid black; text-align: center; vertical-align: middle; font-size: 24px; font-weight: bold;}</style>");
+
+    // Initialize total price
+    let totalPrice = 0;
+
+    // Start the table
+    checkoutWindow.document.write("<table>");
+
+    // Generate HTML for each book in the cart
+    Object.values(cart).forEach((book) => {
+        checkoutWindow.document.write("<tr>");
+        checkoutWindow.document.write("<td><img src='" + book.cover + "' alt='" + book.title + " cover' style='width:200px;height:auto;'></td>");
+        checkoutWindow.document.write("<td>Title: " + book.title + "</td>");
+        checkoutWindow.document.write("<td>Price: " + book.price + "</td>");
+        checkoutWindow.document.write("<td>Quantity: " + book.quantity + "</td>");
+        checkoutWindow.document.write("</tr>");
+
+        // Add the price of the current book to the total price
+        totalPrice += book.price * book.quantity;
+    });
+
+    // End the table
+    checkoutWindow.document.write("</table>");
+
+    // Write the total price to the new window
+    checkoutWindow.document.write("<h2>Total Price: " + totalPrice.toFixed(2) + "</h2>");
+
+    // Add a mock secure payment feature
+    checkoutWindow.document.write("<h2>Payment Details</h2>");
+    checkoutWindow.document.write("<form id='paymentForm'>");
+    checkoutWindow.document.write("Card Number:<br><input type='text' id='cardNumber'><br>");
+    checkoutWindow.document.write("Expiry Date:<br><input type='text' id='expiryDate'><br>");
+    checkoutWindow.document.write("CVV:<br><input type='text' id='cvv'><br>");
+    checkoutWindow.document.write("<input type='submit' value='Submit'>");
+    checkoutWindow.document.write("</form>");
+
+    // Add event listener to form submit
+    checkoutWindow.document.getElementById('paymentForm').addEventListener('submit', function(event) {
+    // Prevent form from submitting normally
+    event.preventDefault();
+
+    // Clear the window and display the success message
+    checkoutWindow.document.body.innerHTML = "<h1>Payment has been processed, thank you for your purchase</h1>";
+
+    // Set the color of the payment processed window to be the same as the checkout window
+    checkoutWindow.document.body.style.backgroundColor="rgb(206, 201, 240)"
+
+    // Display the user's order details
+    checkoutWindow.document.write("<h2>Your Order:</h2>");
+    checkoutWindow.document.write("<style>body {display; inline-block; justify-content: center; text-align:center; color: black; background-color: rgb(206, 201, 240); border: 10px solid black; font-weight:bold; font-family: 'Lucida Sans'; font-size:22px;} table {width: 100%; table-layout: fixed;} th, td {border: 5px solid black; text-align: center; vertical-align: middle; font-size: 24px; font-weight: bold;}</style>");
+    checkoutWindow.document.write("<table>");
+
+    // Generate HTML for each book in the cart
+    Object.values(cart).forEach((book) => {
+        checkoutWindow.document.write("<tr>");
+        checkoutWindow.document.write("<td style='border: 1px solid black;'><img src='" + book.cover + "' alt='" + book.title + " cover' style='width:200px;height:auto;'></td>");
+        checkoutWindow.document.write("<td style='border: 1px solid black;'>Title: " + book.title + "</td>");
+        checkoutWindow.document.write("<td style='border: 1px solid black;'>Price: " + book.price + "</td>");
+        checkoutWindow.document.write("<td style='border: 1px solid black;'>Quantity: " + book.quantity + "</td>");
+        checkoutWindow.document.write("</tr>");
+    });
+
+    checkoutWindow.document.write("</table>");
+    });
+
+}
+    </script>
+</head>
+<body>
+    <img src="logo.png" class="logo">
+    <hr>
+    <nav>
+        <a href="#best-sellers">Best Sellers</a> |
+        <a href="#game-of-the-week">Game of the Week</a> |
+        <a href="#souls-games">Souls Games</a> |
+        <a href="#shooter-games">Shooter Games</a> |
+        <a href="#fighting-games">Fighting Games</a>
+    </nav>
+    <hr>
+    <!-- Search Section -->
+    <div class="search-container">
+    <input type="text" id="searchInput" placeholder="Search for a game..." oninput="searchGame()">
+    <div id="suggestions" class="suggestions-dropdown"></div>
+    </div>
+    <hr> 
+    </div>
+    <div class="container">
+        <table class="fav_tbl" id="best-sellers"> 
+            <caption style="margin-bottom: 5px;">Best Sellers</caption>
+            <tr>
+                <td class="fav_tbl" id="top_left"><img src="eldenring.jpg" class="favourites"></td>
+                <td class="fav_tbl" id="mid_tbl"></td>
+                <td class="fav_tbl" id="top_right"><img src="helldivers2.jpg" class="favourites"></td>
+            </tr>
+            <tr>
+                <td class="fav_tbl" id="left">Elden Ring</td>
+                <td class="fav_tbl" id="mid_tbl"></td>
+                <td class="fav_tbl" id="right">Helldivers 2</td>
+            </tr>
+            <tr>
+                <td class="fav_tbl" id="left"><button class="button" onclick="addToCart({id: 'eldenring', title: 'Elden Ring', cover: 'eldenring.jpg', price: 79.99,})">Add to cart</button></td>
+                <td class="fav_tbl" id="mid_tbl"></td>
+                <td class="fav_tbl" id="right"><button class="button" onclick="addToCart({id: 'helldivers2',title: 'Helldivers 2', cover: 'helldivers2.jpg', price: 59.99,})">Add to cart</button></td>
+            </tr>
+        </table>
+        <hr>
+        <div class="tbl_format" id="game-of-the-week">
+            <table id="goh">
+                <caption style="margin-bottom: 1vh;">Our game of the week</caption>
+                <tr>
+                    <th>Ghost of Tsushima</th>
+                </tr>
+                <tr>    
+                    <td><img src="tsushima.jpg"></td>
+                </tr>
+        </div>
+                <tr>
+                    <td>$99.99</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="dropdown">
+                            <span>Game Description</span>
+                            <div class="dropdown-content">
+                                    <p></p>
+                                
+                            </div>
+                        </td>
+                        </div>
+                    </td>
+ 
+                <tr>
+                    <td><button class="button" onclick="addToCart({id: 'got', title: 'Ghost of Tsushima', cover: 'Tsushima.jpg', price: 99.99,})">Add to cart</button></td>
+                </tr>
+            </table>
+            <hr>
+    </div>
+    <div class="tbl_format" id="souls-games">
+        <table id="gendisp">
+            <caption style="margin-bottom: 1vh;">Souls Games</caption>
+            <tr>
+                <th>Dark Souls 3</th>
+                <th>Elden Ring</th> 
+                <th>Sekiro: Shadows Die Twice</th>
+            </tr>
+            <tr>    
+                <td><img src="ds3.jpg"></td>
+                <td><img src="eldenring.jpg"></td>
+                <td><img src="sekiro.jpg"></td>
+            </tr>
+    </div>
+            <tr>
+                <td>$69.99</td>
+                <td>$79.99</td>
+                <td>$79.99</td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="dropdown">
+                        <span>Game Description</span>
+                        <div class="dropdown-content">
+                            <td>
+                                <div class="dropdown">
+                                    <span>Game Description</span>
+                                    <div class="dropdown-content">
+                                        <p></p>
+                                    </div>
+                                </div>
+                            </td>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="dropdown">
+                        <span>Game Description</span>
+                        <div class="dropdown-content">
+                            <p></p>
+                        </div>
+                    </div>
+                </td>   
+            <tr>
+                <td><button class="button" onclick="addToCart({id: 'ds3', title: 'Dark Souls 3', cover: 'ds3.jpg', price: 69.99,})">Add to cart</button></td>
+                <td><button class="button" onclick="addToCart({id: 'eldenring', title: 'Elden Ring', cover: 'eldenring.jpg', price: 79.99,})">Add to cart</button></td>
+                <td><button class="button" onclick="addToCart({id: 'sekiro', title: 'Sekiro: Shadows Die Twice', cover: 'sekiro.jpg', price: 79.99,})">Add to cart</button></td>
+            </tr>
+        </table> 
+        <hr>
+        <div class="tbl_format" id="shooter-games">
+            <table id="gendisp">
+                <caption style="margin-bottom: 1vh;">Shooter Games</caption>
+                <tr>
+                    <th>Helldivers 2</th>
+                    <th>Call Of Duty</th> 
+                </tr>
+                <tr>    
+                    <td><img src="helldivers2.jpg"></td>
+                    <td><img src="Cod.jpg"></td>
+                </tr>
+        </div>
+                <tr>
+                    <td>$49.99</td>
+                    <td>$89.99</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="dropdown">
+                            <span>Game Description</span>
+                            <div class="dropdown-content">
+                                <td>
+                            <div class="dropdown">
+                                <span>Game Description</span>
+                                <div class="dropdown-content">
+                                    <p></p>
+                                </div>
+                            </div>
+                        </td>
+                        </div>
+                    </td>
+ 
+                <tr>
+                    <td><button class="button" onclick="addToCart({id: 'helldivers2', title: 'Helldivers 2', cover: 'helldivers2.jpg', price: 49.99,})">Add to cart</button></td>
+                    <td><button class="button" onclick="addToCart({id: 'cod', title: 'Call Of Duty', cover: 'cod.jpg', price: 89.99,})">Add to cart</button></td>
+                </tr>
+            </table> 
+            <hr>
+            <div class="tbl_format" id="fighting-games">
+            <table id="gendisp">
+                <caption style="margin-bottom: 1vh;">Fighting Games</caption>
+                <tr>
+                    <th>Mortal Kombat 1</th>
+                    <th>Street Fighter 6</th> 
+                    <th>Tekken 8</th>
+                </tr>
+                <tr>    
+                    <td><img src="mk1.jpg"></td>
+                    <td><img src="sf6.jpg"></td>
+                    <td><img src="t8.jpg"></td>
+                </tr>
+        </div>
+                <tr>
+                    <td>$99.99</td>
+                    <td>$99.99</td>
+                    <td>$114.99</td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="dropdown">
+                            <span>Game Description</span>
+                            <div class="dropdown-content">
+                                <td>
+                                    <div class="dropdown">
+                                        <span>Game Description</span>
+                                        <div class="dropdown-content">
+                                            <p></p>
+                                        </div>
+                                    </div>
+                                </td>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="dropdown">
+                            <span>Game Description</span>
+                            <div class="dropdown-content">
+                                <p></p>
+                            </div>
+                        </div>
+                    </td>  
+                        </div>
+                            </td>
+ 
+                <tr>
+                    <td><button class="button" onclick="addToCart({id: 'mortal kombat 1', title: 'Mortal Kombat 1', cover: 'mk1.jpg', price: 99.99,})">Add to cart</button></td>
+                    <td><button class="button" onclick="addToCart({id: 'street fighter 6', title: 'Street Fighter 6', cover: 'sf6.jpg', price: 99.99,})">Add to cart</button></td>
+                    <td><button class="button" onclick="addToCart({id: 'tekken 8', title: 'Tekken 8', cover: 't8.jpg', price: 114.99,})">Add to cart</button></td>
+                </tr>
+            </table>
+            <hr>
+            <footer>Contact us: gggonext@gmail.com,     0423 069 855</footer>
+    <img id="cart" src="shopping_cart_FILL0_wght400_GRAD0_opsz24.png" alt="Shopping Cart" onclick="showCart()" width="30px">
+    <div id="cartDetails"></div>
+</body>
+</html>
