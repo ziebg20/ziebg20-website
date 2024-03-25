@@ -10,11 +10,12 @@
     <title>GG, Go Next</title>    
 
     <script>
-    function searchGame() {
+        function searchGame() {
         let input = document.getElementById('searchInput').value.toLowerCase();
         const suggestions = document.getElementById('suggestions');
         const searchInput = document.getElementById('searchInput');
         suggestions.textContent = '';
+        
 
         const games = {
             'Elden Ring': '#souls-games',
@@ -28,7 +29,7 @@
             'Tekken 8': '#fighting-games'
         };
 
-        const filteredGames = Object.keys(games).filter(game => game.includes(input));
+        const filteredGames = Object.keys(games).filter(game => game.toLowerCase().includes(input));
 
         if (filteredGames.length > 0 && input !== '') {
             const suggestionsList = document.createElement('ul');
