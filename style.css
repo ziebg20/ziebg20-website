@@ -220,20 +220,30 @@ footer {
 }
 
 .dropdown-content {
-    display: none;
-    position: absolute;
+    display: block; /* Change this from 'none' to 'block' */
+    position: relative;
     min-width: 160px;
     z-index: 1;
+    background-color: #f8f8f8;
+    border: 1px solid #ccc;
+    padding: 10px;
+    width: 380px;
+    height: auto;
+    max-height: 0; /* Initially set max-height to 0 */
+    overflow: hidden; /* Hide overflow */
+    transition: 2s ease-out; /* Transition max-height */
 }
 
 .dropdown:hover .dropdown-content {
+    max-height: 400vh; /* Adjust this value based on the content size */
     display: block;
 }
 
+
 .dropdown::after {
     content: '▼';
-    position: absolute;
-    right: -1vw;
+    position: relative;
+    right: .5vw;
     top: 0;
 }
 
